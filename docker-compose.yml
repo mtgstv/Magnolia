@@ -1,0 +1,15 @@
+services:
+  db:
+    image: postgres:17
+    container_name: magnolia-db
+    environment:
+      POSTGRES_DB: magnolia
+      POSTGRES_USER: magnolia
+      POSTGRES_PASSWORD: magnolia123
+    ports:
+      - "5433:5432"
+    volumes:
+      - magnolia-data:/var/lib/postgresql/data
+
+volumes:
+  magnolia-data:
