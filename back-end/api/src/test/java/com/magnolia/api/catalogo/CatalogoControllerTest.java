@@ -1,6 +1,8 @@
 package com.magnolia.api.catalogo;
 
 import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.everyItem;
+import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.hasSize;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -36,7 +38,7 @@ class CatalogoControllerTest extends TesteDeIntegracao {
 				.andExpect(jsonPath("$.variantes", hasSize(2)))
 				.andExpect(jsonPath("$.variantes[1].volumeMl").value(100))
 				.andExpect(jsonPath("$.variantes[1].precoPromocional").value(74990))
-				.andExpect(jsonPath("$.imagens[0].url").value("/images/produtos/sauvage-eau-de-parfum.svg"));
+				.andExpect(jsonPath("$.imagens[0].url").value("/images/produtos/sauvage-eau-de-parfum.jpg"));
 	}
 
 	@Test
@@ -60,5 +62,35 @@ class CatalogoControllerTest extends TesteDeIntegracao {
 				.andExpect(status().isOk())
 				.andExpect(jsonPath("$", hasSize(3)))
 				.andExpect(jsonPath("$[0].link").value("/catalogo?familia=Floral"));
+	}
+
+	@Test
+	void buscaSemAcentoPeloNomeMarcaOuNotas() throws Exception {
+		mvc.perform(get("/produtos").param("q", "memoire"))
+				.andExpect(jsonPath("$[*].slug", contains("memoire-d-une-odeur")));
+
+		// Cada palavra precisa aparecer: Dior + baunilha (nas notas de fundo) = Sauvage
+		mvc.perform(get("/produtos").param("q", "dior baunilha"))
+				.andExpect(jsonPath("$[*].slug", contains("sauvage-eau-de-parfum")));
+	}
+
+	@Test
+	void filtraEOrdenaNaApi() throws Exception {
+		mvc.perform(get("/produtos")
+				.param("categoria", "masculino")
+				.param("marca", "paco-rabanne")
+				.param("ordenacao", "menor-preco"))
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$[*].slug", contains("1-million", "invictus")));
+
+		// Preços em centavos: até R$ 450 (o CK One custa R$ 399,90)
+		mvc.perform(get("/produtos").param("precoMax", "45000"))
+				.andExpect(jsonPath("$[*].slug", contains("ck-one")));
+
+		mvc.perform(get("/produtos").param("familia", "Gourmand").param("familia", "Oriental").param("ordenacao", "nome-az"))
+				.andExpect(jsonPath("$[*].slug", contains("black-opium", "good-girl", "la-vie-est-belle")));
+
+		mvc.perform(get("/produtos").param("promocao", "true"))
+				.andExpect(jsonPath("$[*].descontoMaximo", everyItem(greaterThan(0))));
 	}
 }

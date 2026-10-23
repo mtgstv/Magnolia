@@ -17,4 +17,12 @@ public interface ProdutoRepository extends JpaRepository<Produto, Long> {
 	Optional<Produto> findBySlugAndAtivoTrue(String slug);
 
 	Optional<Produto> findByIdAndAtivoTrue(Long id);
+
+	// Painel admin: inclui os perfumes desativados
+	@EntityGraph(attributePaths = { "marca", "categoria" })
+	List<Produto> findAllByOrderByNomeAsc();
+
+	boolean existsBySlug(String slug);
+
+	boolean existsBySlugAndIdNot(String slug, Long id);
 }

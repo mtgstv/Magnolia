@@ -11,10 +11,12 @@ import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @Table(name = "imagem_produto")
 @Getter
+@Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class ImagemProduto {
 
@@ -31,4 +33,10 @@ public class ImagemProduto {
 	private int ordem;
 
 	private String alt;
+
+	public ImagemProduto(Produto produto, String url, String alt) {
+		this.produto = produto;
+		this.url = url;
+		this.alt = alt;
+	}
 }

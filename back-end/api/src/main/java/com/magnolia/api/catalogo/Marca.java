@@ -22,4 +22,9 @@ public class Marca {
 	private String nome;
 
 	private String slug;
+
+	public Marca(String nome, String slug) {
+		this.nome = nome;
+		this.slug = slug;
+	}
 }

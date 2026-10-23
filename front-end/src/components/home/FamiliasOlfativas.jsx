@@ -1,17 +1,6 @@
 import { Link } from "react-router-dom";
-import { Citrus, Cookie, Droplets, Flame, Flower2, Leaf, TreePine } from "lucide-react";
-
+import { FAMILIA_PADRAO, FAMILIAS } from "../../utils/familias";
 import Secao from "../ui/Secao";
-
-// Ícone e descrição de cada família. Uma família nova no banco aparece com o ícone padrão.
-const FAMILIAS = {
-  Floral: { icone: Flower2, descricao: "Rosas, jasmim e flores brancas" },
-  Cítrico: { icone: Citrus, descricao: "Limão, bergamota e frescor" },
-  Amadeirado: { icone: TreePine, descricao: "Sândalo, cedro e vetiver" },
-  Oriental: { icone: Flame, descricao: "Especiarias, âmbar e baunilha" },
-  Gourmand: { icone: Cookie, descricao: "Notas doces e envolventes" },
-  Aromático: { icone: Leaf, descricao: "Ervas, lavanda e notas verdes" }
-};
 
 // "Encontre seu perfume": atalhos para o catálogo filtrado por família olfativa
 export default function FamiliasOlfativas({ produtos }) {
@@ -30,7 +19,7 @@ export default function FamiliasOlfativas({ produtos }) {
       <Secao id="familias" rotulo="Encontre seu perfume" titulo="Escolha pela família olfativa">
         <ul className="grid grid-cols-2 gap-4 md:grid-cols-3 xl:grid-cols-6">
           {nomes.map((nome) => {
-            const { icone: Icone, descricao } = FAMILIAS[nome] ?? { icone: Droplets, descricao: "" };
+            const { icone: Icone, descricao } = FAMILIAS[nome] ?? FAMILIA_PADRAO;
             const total = totais.get(nome);
 
             return (

@@ -7,15 +7,16 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-// Banner do carrossel de promoções do catálogo
+// Banner do carrossel de promoções do catálogo (editável no painel admin)
 @Entity
 @Table(name = "promocao")
 @Getter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Setter
+@NoArgsConstructor
 public class Promocao {
 
 	@Id

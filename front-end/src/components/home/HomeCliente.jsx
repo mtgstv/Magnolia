@@ -5,6 +5,7 @@ import { useCarregar } from "../../hooks/useCarregar";
 import { useFavoritos } from "../../hooks/useFavoritos";
 import { listarRecomendacoes } from "../../services/favoritosService";
 import { listarProdutos } from "../../services/produtosService";
+import CarrosselProdutos from "../produto/CarrosselProdutos";
 import GradeProdutos from "../produto/GradeProdutos";
 import Botao from "../ui/Botao";
 import EstadoVazio from "../ui/EstadoVazio";
@@ -58,7 +59,7 @@ export default function HomeCliente() {
         {produtos.erro ? (
           <MensagemErro erro={produtos.erro} aoTentarDeNovo={produtos.recarregar} />
         ) : (
-          <GradeProdutos produtos={lista.slice(0, 4)} carregando={produtos.carregando} />
+          <CarrosselProdutos produtos={lista.slice(0, 8)} carregando={produtos.carregando} />
         )}
       </Secao>
 

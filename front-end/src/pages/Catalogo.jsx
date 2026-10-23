@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 import { ChevronDown, Search, SlidersHorizontal } from "lucide-react";
 
@@ -17,12 +17,15 @@ import { listarMarcas } from "../services/marcasService";
 import { listarProdutos } from "../services/produtosService";
 import { listarPromocoes } from "../services/promocoesService";
 import {
-  filtrarProdutos,
   lerFiltros,
   ORDENACOES,
   paraParams,
+  paraParamsApi,
   semFiltros
 } from "../utils/filtrosCatalogo";
+
+// Espera a pessoa parar de digitar antes de buscar na API (uma busca por letra seria demais)
+const ESPERA_BUSCA = 300;
 
 function contarPor(produtos, campo) {
   const totais = new Map();
@@ -59,7 +62,18 @@ function ConteudoCatalogo({ urlInicial, focarBusca }) {
   const [filtros, setFiltros] = useState(() => lerFiltros(new URLSearchParams(urlInicial)));
   const [filtrosAbertos, setFiltrosAbertos] = useState(false);
 
-  const produtos = useCarregar(listarProdutos);
+  // A busca, os filtros e a ordenação são feitos pela API
+  const [buscaDigitada, setBuscaDigitada] = useState(filtros.busca);
+  useEffect(() => {
+    const temporizador = setTimeout(() => setBuscaDigitada(filtros.busca), ESPERA_BUSCA);
+    return () => clearTimeout(temporizador);
+  }, [filtros.busca]);
+  const consulta = paraParamsApi({ ...filtros, busca: buscaDigitada }).toString();
+  const buscarResultado = useCallback(() => listarProdutos(new URLSearchParams(consulta)), [consulta]);
+  const produtos = useCarregar(buscarResultado);
+
+  // Todos os perfumes, só para contar quantos há em cada filtro (ex.: "Dior (2)")
+  const todos = useCarregar(listarProdutos);
   const marcas = useCarregar(listarMarcas);
   const categorias = useCarregar(listarCategorias);
   const promocoes = useCarregar(listarPromocoes);
@@ -76,10 +90,10 @@ function ConteudoCatalogo({ urlInicial, focarBusca }) {
 
   const fecharFiltros = useCallback(() => setFiltrosAbertos(false), []);
 
-  const lista = produtos.dados ?? [];
+  const lista = todos.dados ?? [];
   const listaCategorias = categorias.dados ?? [];
   const listaMarcas = marcas.dados ?? [];
-  const resultado = filtrarProdutos(lista, filtros);
+  const resultado = produtos.dados ?? [];
 
   const contagens = {
     categorias: contarPor(lista, "categoriaSlug"),
@@ -119,7 +133,7 @@ function ConteudoCatalogo({ urlInicial, focarBusca }) {
 
       <div className="mt-6">
         {promocoes.carregando ? (
-          <div className="h-56 animate-pulse rounded-3xl bg-stone-100 sm:h-64 lg:h-72" />
+          <div className="h-56 animate-pulse rounded-3xl bg-areia sm:h-64 lg:h-72" />
         ) : (
           promocoes.dados?.length > 0 && <PromotionsCarousel promocoes={promocoes.dados} />
         )}
@@ -132,7 +146,7 @@ function ConteudoCatalogo({ urlInicial, focarBusca }) {
 
       <div className="mt-8 grid gap-10 lg:grid-cols-[250px_1fr] xl:gap-14">
         <aside className="hidden lg:block" aria-label="Filtros">
-          <div className="sticky top-6">
+          <div className="sticky top-24">
             <div className="flex items-center justify-between pb-5">
               <h2 className="text-lg font-medium text-stone-900">Filtrar</h2>
               {!semFiltros(filtros) && (
@@ -198,7 +212,7 @@ function ConteudoCatalogo({ urlInicial, focarBusca }) {
           </div>
 
           <p className="mt-5 text-sm text-stone-500" aria-live="polite">
-            {produtos.carregando && lista.length === 0
+            {produtos.carregando && resultado.length === 0
               ? "Carregando perfumes..."
               : `${resultado.length} ${resultado.length === 1 ? "perfume encontrado" : "perfumes encontrados"}`}
           </p>

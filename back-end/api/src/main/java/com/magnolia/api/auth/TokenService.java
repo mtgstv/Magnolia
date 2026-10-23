@@ -72,7 +72,7 @@ public class TokenService {
 		tokens.deleteByTokenHash(hash(tokenRenovacao));
 	}
 
-	static String hash(String token) {
+	public static String hash(String token) {
 		try {
 			byte[] resumo = MessageDigest.getInstance("SHA-256").digest(token.getBytes(StandardCharsets.UTF_8));
 			return HexFormat.of().formatHex(resumo);

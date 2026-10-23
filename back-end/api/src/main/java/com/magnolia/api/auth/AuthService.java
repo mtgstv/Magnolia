@@ -1,5 +1,6 @@
 package com.magnolia.api.auth;
 
+import java.nio.charset.StandardCharsets;
 import java.util.Locale;
 import java.util.Optional;
 
@@ -27,8 +28,20 @@ public class AuthService {
 	private final PasswordEncoder senhas;
 	private final TokenService tokens;
 
+	// O BCrypt só aceita senhas de até 72 bytes, e letras com acento ocupam 2 bytes cada
+	private static final int LIMITE_BYTES_SENHA = 72;
+
+	// Hash de uma senha qualquer, conferido quando o e-mail não existe: assim o login demora
+	// o mesmo tempo com ou sem conta, e o tempo de resposta não revela quem é cliente
+	private String hashFalso;
+
 	@Transactional
 	public SessaoIniciada cadastrar(CadastroRequest dados) {
+		if (senhaGrandeDemais(dados.senha())) {
+			throw new ErroApiException(HttpStatus.BAD_REQUEST,
+					"A senha é longa demais. Use até 72 caracteres (letras com acento contam como dois).");
+		}
+
 		String email = normalizarEmail(dados.email());
 		if (usuarios.existsByEmail(email)) {
 			throw emailEmUso();
@@ -45,12 +58,21 @@ public class AuthService {
 
 	@Transactional
 	public SessaoIniciada entrar(LoginRequest dados) {
-		Usuario usuario = usuarios.findByEmail(normalizarEmail(dados.email()))
-				.filter(u -> senhas.matches(dados.senha(), u.getSenhaHash()))
-				// A mesma mensagem para e-mail inexistente e senha errada, para não revelar quem tem conta
-				.orElseThrow(() -> new ErroApiException(HttpStatus.UNAUTHORIZED, "E-mail ou senha incorretos."));
+		// A mesma mensagem para e-mail inexistente e senha errada, para não revelar quem tem conta
+		ErroApiException incorretos = new ErroApiException(HttpStatus.UNAUTHORIZED, "E-mail ou senha incorretos.");
 
-		return iniciarSessao(usuario);
+		// Nenhuma conta tem senha tão grande (o cadastro barra), e o BCrypt daria erro com ela
+		if (senhaGrandeDemais(dados.senha())) {
+			throw incorretos;
+		}
+
+		Optional<Usuario> usuario = usuarios.findByEmail(normalizarEmail(dados.email()));
+		String hash = usuario.map(Usuario::getSenhaHash).orElseGet(this::hashFalso);
+		if (!senhas.matches(dados.senha(), hash) || usuario.isEmpty()) {
+			throw incorretos;
+		}
+
+		return iniciarSessao(usuario.get());
 	}
 
 	// Vazio quando o token de renovação não existe ou já venceu
@@ -68,6 +90,17 @@ public class AuthService {
 	private SessaoIniciada iniciarSessao(Usuario usuario) {
 		return new SessaoIniciada(UsuarioResponse.de(usuario), tokens.gerarTokenAcesso(usuario),
 				tokens.criarTokenRenovacao(usuario));
+	}
+
+	private String hashFalso() {
+		if (hashFalso == null) {
+			hashFalso = senhas.encode("senha-que-nenhuma-conta-usa");
+		}
+		return hashFalso;
+	}
+
+	private static boolean senhaGrandeDemais(String senha) {
+		return senha.getBytes(StandardCharsets.UTF_8).length > LIMITE_BYTES_SENHA;
 	}
 
 	private static String normalizarEmail(String email) {

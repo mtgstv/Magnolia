@@ -23,12 +23,12 @@ public class CatalogoService {
 	private final CategoriaRepository categorias;
 	private final PromocaoRepository promocoes;
 
-	// O catálogo é pequeno, então vai inteiro para o front, que filtra e ordena na hora
-	public List<ProdutoResumo> listarProdutos() {
-		return produtos.findByAtivoTrueOrderByCriadoEmDesc().stream()
+	// Busca, filtra e ordena aqui na API (ver FiltroProdutos). O catálogo tem poucas dezenas de perfumes,
+	// então a filtragem é feita em Java depois de uma única consulta; com milhares, valeria passar para o SQL.
+	public List<ProdutoResumo> listarProdutos(FiltroProdutos filtro) {
+		return filtro.aplicar(produtos.findByAtivoTrueOrderByCriadoEmDesc().stream()
 				.filter(ProdutoResumo::temVariante)
-				.map(ProdutoResumo::de)
-				.toList();
+				.toList());
 	}
 
 	public ProdutoDetalhe buscarProduto(String slug) {

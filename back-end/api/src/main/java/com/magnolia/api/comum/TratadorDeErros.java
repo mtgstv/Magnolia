@@ -3,6 +3,7 @@ package com.magnolia.api.comum;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -34,5 +35,12 @@ public class TratadorDeErros {
 	public ResponseEntity<ErroResponse> corpoIlegivel() {
 		return ResponseEntity.status(HttpStatus.BAD_REQUEST)
 				.body(ErroResponse.de("Não foi possível ler os dados enviados."));
+	}
+
+	// Regra do banco (UNIQUE, CHECK...) barrou a gravação, ex.: dois volumes trocando de ml ao mesmo tempo
+	@ExceptionHandler(DataIntegrityViolationException.class)
+	public ResponseEntity<ErroResponse> conflitoNoBanco() {
+		return ResponseEntity.status(HttpStatus.CONFLICT)
+				.body(ErroResponse.de("Não foi possível salvar: algum dado repete outro já cadastrado. Confira e tente de novo."));
 	}
 }

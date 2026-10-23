@@ -7,7 +7,8 @@ services:
       POSTGRES_USER: magnolia
       POSTGRES_PASSWORD: magnolia123
     ports:
-      - "5433:5432"
+      # 127.0.0.1: só este computador acessa o banco (sem isso, qualquer aparelho da rede Wi-Fi conseguiria)
+      - "127.0.0.1:5433:5432"
     volumes:
       - magnolia-data:/var/lib/postgresql/data
 

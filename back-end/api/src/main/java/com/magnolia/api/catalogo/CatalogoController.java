@@ -19,9 +19,10 @@ public class CatalogoController {
 
 	private final CatalogoService catalogo;
 
+	// Sem parâmetros devolve todos; com eles, busca e filtra (ver FiltroProdutos)
 	@GetMapping("/produtos")
-	public List<ProdutoResumo> listarProdutos() {
-		return catalogo.listarProdutos();
+	public List<ProdutoResumo> listarProdutos(FiltroProdutos filtro) {
+		return catalogo.listarProdutos(filtro);
 	}
 
 	@GetMapping("/produtos/{slug}")

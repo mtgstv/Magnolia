@@ -6,6 +6,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -21,10 +22,12 @@ import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @Table(name = "produto")
 @Getter
+@Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Produto {
 
@@ -57,17 +60,26 @@ public class Produto {
 
 	private String notasFundo;
 
-	private boolean ativo;
+	private boolean ativo = true;
 
-	private Instant criadoEm;
+	private Instant criadoEm = Instant.now();
 
-	@OneToMany(mappedBy = "produto")
+	// cascade + orphanRemoval: salvar o produto salva os volumes e as imagens; tirar um deles da lista apaga do banco
+	@OneToMany(mappedBy = "produto", cascade = CascadeType.ALL, orphanRemoval = true)
 	@OrderBy("volumeMl")
 	private List<Variante> variantes = new ArrayList<>();
 
-	@OneToMany(mappedBy = "produto")
+	@OneToMany(mappedBy = "produto", cascade = CascadeType.ALL, orphanRemoval = true)
 	@OrderBy("ordem")
 	private List<ImagemProduto> imagens = new ArrayList<>();
+
+	// Usado pelo painel admin para cadastrar um perfume novo
+	public Produto(Marca marca, Categoria categoria, String nome, String slug) {
+		this.marca = marca;
+		this.categoria = categoria;
+		this.nome = nome;
+		this.slug = slug;
+	}
 
 	// Variante usada no card do catálogo: a de menor preço ("a partir de")
 	public Optional<Variante> varianteMaisBarata() {

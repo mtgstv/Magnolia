@@ -14,5 +14,8 @@ public record AuthProperties(
 		// Por quanto tempo o login fica salvo sem pedir a senha de novo
 		Duration duracaoRenovacao,
 		// true em produção (HTTPS): o navegador só envia o cookie por conexão segura
-		boolean cookieSeguro) {
+		boolean cookieSeguro,
+		// Quantas vezes o mesmo IP pode chamar login/cadastro dentro da janela (contra robôs testando senhas)
+		int limiteTentativas,
+		Duration janelaTentativas) {
 }

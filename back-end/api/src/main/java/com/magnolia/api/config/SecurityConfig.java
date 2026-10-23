@@ -44,10 +44,12 @@ public class SecurityConfig {
 				// Catálogo é público
 				.requestMatchers(HttpMethod.GET, "/produtos/**", "/categorias/**", "/marcas/**", "/promocoes/**").permitAll()
 				.requestMatchers("/auth/**").permitAll()
+				// Painel admin: só quem tem papel ADMIN
+				.requestMatchers("/admin/**").hasRole("ADMIN")
 				// Visitante também tem carrinho (identificado pela sessao_id)
 				.requestMatchers("/carrinho/**").permitAll()
 				.requestMatchers("/error").permitAll()
-				// Perfil, favoritos, endereços e pedidos exigem login
+				// Perfil, favoritos, pedidos e escrever avaliações exigem login
 				.anyRequest().authenticated())
 			.oauth2ResourceServer(servidor -> servidor
 				.bearerTokenResolver(tokenDoCookie())

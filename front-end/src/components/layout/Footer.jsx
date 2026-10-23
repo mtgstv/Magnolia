@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 
 import { useAuth } from "../../hooks/useAuth";
+import FlorMagnolia from "../ui/FlorMagnolia";
 
 const LINKS_LOJA = [
   { texto: "Catálogo completo", para: "/catalogo" },
@@ -28,8 +29,16 @@ export default function Footer() {
     <footer className="mt-20 bg-marca-escura text-green-50">
       <div className="conteudo grid gap-12 py-16 sm:grid-cols-2 lg:grid-cols-[1.6fr_1fr_1fr_1fr]">
         <div className="max-w-sm">
-          <Link to="/" className="inline-flex flex-col gap-1">
-            <span className="font-bodoni text-4xl text-white">Magnolia</span>
+          <Link to="/" className="group/titulo inline-flex flex-col gap-1">
+            {/* Flor "brotando" do "o": fica solta, não mexe no alinhamento do subtítulo */}
+            <span className="relative w-fit font-bodoni text-4xl text-white">
+              Magn
+              <span className="relative">
+                o
+                <FlorMagnolia className="absolute left-1/2 top-[0.7em] w-[0.62em] -translate-x-1/2 -translate-y-full origin-bottom transition-[rotate] duration-500 group-hover/titulo:rotate-[10deg]" />
+              </span>
+              lia
+            </span>
             <span className="text-xs uppercase tracking-[0.3em] text-green-200">Perfumaria botânica</span>
           </Link>
           <p className="mt-5 text-sm leading-relaxed text-green-100/80">

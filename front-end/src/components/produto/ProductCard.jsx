@@ -12,14 +12,14 @@ export default function ProductCard({ produto }) {
 
   return (
     <article className="group flex flex-col">
-      <div className="relative overflow-hidden rounded-2xl bg-stone-100">
+      <div className="relative overflow-hidden rounded-2xl bg-areia shadow-sm ring-1 ring-stone-900/5 transition-shadow duration-500 group-hover:shadow-xl group-hover:shadow-stone-900/10">
         {/* A foto também leva ao produto, mas fica fora do Tab: o nome já é o link acessível */}
         <Link to={linkProduto} tabIndex={-1} aria-hidden="true" className="block aspect-[4/5]">
           <ImagemProduto
             src={produto.imagem}
             alt=""
             loading="lazy"
-            className="size-full object-contain p-6 transition-transform duration-500 group-hover:scale-105 motion-reduce:transition-none"
+            className="size-full object-cover transition-transform duration-500 group-hover:scale-105 motion-reduce:transition-none"
           />
         </Link>
 

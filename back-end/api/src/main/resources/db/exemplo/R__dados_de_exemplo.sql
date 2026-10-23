@@ -112,9 +112,9 @@ FROM (VALUES
 JOIN produto pr ON pr.slug = v.produto
 ON CONFLICT (sku) DO NOTHING;
 
--- As imagens ficam em front-end/public/images/produtos/<slug>.svg
+-- As fotos ficam em front-end/public/images/produtos/<slug>.jpg (créditos em front-end/public/images/CREDITOS.md)
 INSERT INTO imagem_produto (produto_id, url, ordem, alt)
-SELECT pr.id, '/images/produtos/' || pr.slug || '.svg', 0, 'Frasco do perfume ' || pr.nome
+SELECT pr.id, '/images/produtos/' || pr.slug || '.jpg', 0, 'Frasco do perfume ' || pr.nome
 FROM produto pr
 WHERE pr.slug = ANY (ARRAY[
     'sauvage-eau-de-parfum', 'good-girl', '1-million', 'la-vie-est-belle', 'acqua-di-gio',
@@ -126,8 +126,21 @@ WHERE pr.slug = ANY (ARRAY[
 INSERT INTO promocao (titulo, imagem_url, link, inicio, fim, ordem)
 SELECT p.titulo, p.imagem, p.link, TIMESTAMPTZ '2026-01-01 00:00:00-03', TIMESTAMPTZ '2027-12-31 23:59:59-03', p.ordem
 FROM (VALUES
-    ('Semana Floral: perfumes florais com até 20% de desconto', '/images/promocoes/semana-floral.svg', '/catalogo?familia=Floral', 1),
-    ('Ofertas da estação em perfumes selecionados', '/images/promocoes/ofertas.svg', '/catalogo?promocao=1', 2),
-    ('Chegaram as novidades: conheça os lançamentos', '/images/promocoes/novidades.svg', '/catalogo?ordenacao=novidades', 3)
+    ('Semana Floral: perfumes florais com até 20% de desconto', '/images/promocoes/semana-floral.jpg', '/catalogo?familia=Floral', 1),
+    ('Ofertas da estação em perfumes selecionados', '/images/promocoes/ofertas.jpg', '/catalogo?promocao=1', 2),
+    ('Chegaram as novidades: conheça os lançamentos', '/images/promocoes/novidades.jpg', '/catalogo?ordenacao=novidades', 3)
 ) AS p (titulo, imagem, link, ordem)
 WHERE NOT EXISTS (SELECT 1 FROM promocao x WHERE x.titulo = p.titulo);
+
+-- Bancos criados antes da troca ainda apontam para as ilustrações .svg antigas: passa a usar as fotos .jpg
+UPDATE imagem_produto SET url = replace(url, '.svg', '.jpg')
+WHERE url LIKE '/images/produtos/%.svg';
+
+UPDATE promocao SET imagem_url = replace(imagem_url, '.svg', '.jpg')
+WHERE imagem_url LIKE '/images/promocoes/%.svg';
+
+-- Conta de administrador para testar o painel /admin no seu computador (só existe no perfil dev).
+-- E-mail: admin@magnolia.com · Senha: magnolia-admin-123 (o banco guarda só o hash BCrypt)
+INSERT INTO usuario (nome, email, senha_hash, papel)
+VALUES ('Admin Magnolia', 'admin@magnolia.com', '$2a$10$1fyHF5YNd0HJs1oVAFjXoOpSLAhEtjavRBs4ms7Fh3GypP381bIam', 'ADMIN')
+ON CONFLICT (email) DO NOTHING;

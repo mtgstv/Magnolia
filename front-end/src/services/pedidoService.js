@@ -1,7 +1,6 @@
 import { requisicao } from "./api";
 
-// Os pedidos ainda não têm rotas na API: estas chamadas já seguem o formato esperado
-
+// dados: { endereco, frete: "PADRAO" | "EXPRESSA", pagamento: { metodo: "PIX" | "CARTAO", cartao? } }
 export function criarPedido(dados) {
   return requisicao("/pedidos", { method: "POST", corpo: dados });
 }
@@ -10,6 +9,11 @@ export function listarPedidos() {
   return requisicao("/pedidos");
 }
 
-export function buscarPedido(id) {
-  return requisicao(`/pedidos/${encodeURIComponent(id)}`);
+export function buscarPedido(numero) {
+  return requisicao(`/pedidos/${encodeURIComponent(numero)}`);
+}
+
+// Só existe porque o pagamento é de teste: confirma o Pix como se o banco tivesse avisado
+export function simularPagamentoPix(numero) {
+  return requisicao(`/pedidos/${encodeURIComponent(numero)}/simular-pagamento`, { method: "POST" });
 }

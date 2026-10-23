@@ -2,29 +2,58 @@
 
 /*
   Identidade visual da Magnolia. Use pelo nome nas classes do Tailwind:
-  bg-marca, text-marca-media, border-destaque, font-bodoni...
+  bg-marca, text-marca-media, border-destaque, bg-fundo, font-bodoni...
   Para mudar uma cor no site inteiro, basta trocar aqui.
 */
 @theme {
   --font-bodoni: "Bodoni Moda", serif;
   --font-inter: "Inter", sans-serif;
 
-  /* Verde: botões, links e textos de destaque */
-  --color-marca: oklch(44.8% 0.119 151.328);          /* green-800 */
-  --color-marca-escura: oklch(26.6% 0.065 152.934);   /* green-950: rodapé e hover */
-  --color-marca-media: oklch(52.7% 0.154 150.069);    /* green-700: rótulos pequenos */
-  --color-marca-clara: oklch(98.2% 0.018 155.826);    /* green-50: fundos suaves */
-  --color-marca-suave: oklch(96.2% 0.044 156.743);    /* green-100: faixa de avisos */
+  /* Fundo da página: um creme quente, mais confortável para os olhos que o branco puro */
+  --color-fundo: oklch(97.4% 0.011 84);
+  --color-areia: oklch(93.6% 0.02 80);                /* blocos e faixas em tom de areia */
+
+  /* Verde-floresta: botões, links e textos de destaque */
+  --color-marca: oklch(42% 0.09 155);
+  --color-marca-escura: oklch(26% 0.05 160);          /* rodapé, faixa de avisos e hover */
+  --color-marca-media: oklch(50% 0.11 152);           /* rótulos pequenos */
+  --color-marca-clara: oklch(95.6% 0.022 150);        /* fundos suaves (verde-sálvia) */
+  --color-marca-suave: oklch(91.5% 0.04 150);         /* bordas e detalhes em verde */
 
   /* Rosa da magnólia: hover e detalhes */
   --color-destaque: oklch(71.8% 0.202 349.761);       /* pink-400 */
-  --color-destaque-clara: oklch(97.1% 0.014 343.198); /* pink-50 */
+  --color-destaque-clara: oklch(96% 0.02 350);
+
+  /* Dourado discreto: cupons e selos */
+  --color-dourado: oklch(80% 0.11 85);
 
   /* Selos de desconto */
   --color-oferta: oklch(51.4% 0.222 16.935);          /* rose-700 */
 
   /* Faixa de avisos do topo: cada aviso desce e aparece aos poucos */
   --animate-aviso: aviso-entra 0.6s ease-out;
+  /* Elementos que sobem e aparecem (cartão do hero, menus) */
+  --animate-surgir: surgir 0.5s ease-out both;
+  /* Texto do hero: entra deslizando da direita para a esquerda */
+  --animate-deslizar: deslizar 0.8s cubic-bezier(0.22, 1, 0.36, 1) both;
+  /* Letreiro de marcas: passa sem parar */
+  --animate-letreiro: letreiro 40s linear infinite;
+  /* Zoom bem lento na foto do hero */
+  --animate-zoom-lento: zoom-lento 12s ease-out both;
+
+  /* Pétalas da flor do título balançando (ver components/ui/FlorMagnolia.jsx) */
+  --animate-petala-esquerda: petala-esquerda 0.9s ease-in-out infinite;
+  --animate-petala-direita: petala-direita 0.9s ease-in-out infinite;
+
+  @keyframes petala-esquerda {
+    0%, 100% { rotate: 0deg; }
+    50% { rotate: -14deg; }
+  }
+
+  @keyframes petala-direita {
+    0%, 100% { rotate: 0deg; }
+    50% { rotate: 14deg; }
+  }
 
   @keyframes aviso-entra {
     from {
@@ -34,6 +63,46 @@
     to {
       opacity: 1;
       transform: translateY(0);
+    }
+  }
+
+  @keyframes surgir {
+    from {
+      opacity: 0;
+      transform: translateY(0.5rem);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes deslizar {
+    from {
+      opacity: 0;
+      transform: translateX(2.5rem);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+
+  @keyframes letreiro {
+    from {
+      transform: translateX(0);
+    }
+    to {
+      transform: translateX(-50%);
+    }
+  }
+
+  @keyframes zoom-lento {
+    from {
+      transform: scale(1.08);
+    }
+    to {
+      transform: scale(1);
     }
   }
 }
@@ -51,8 +120,53 @@
   }
 }
 
+/* Esconde a barra de rolagem (carrosséis que rolam para o lado) */
+@utility sem-barra {
+  scrollbar-width: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
 @layer base {
   body {
-    @apply bg-white font-inter text-stone-800 antialiased;
+    @apply bg-fundo font-inter text-stone-800 antialiased;
+
+    /*
+      Fundo com textura: um pontilhado verde bem clarinho por cima de dois brilhos suaves
+      (rosa no canto de cima, verde-sálvia no canto de baixo). "fixed": o fundo fica parado
+      enquanto o conteúdo rola.
+    */
+    background-image:
+      radial-gradient(circle at 1px 1px, color-mix(in oklch, var(--color-marca) 13%, transparent) 1px, transparent 0),
+      radial-gradient(70rem 45rem at 100% 0%, color-mix(in oklch, var(--color-destaque-clara) 90%, transparent), transparent 70%),
+      radial-gradient(60rem 45rem at 0% 100%, color-mix(in oklch, var(--color-marca-clara) 95%, transparent), transparent 70%);
+    background-size: 22px 22px, auto, auto;
+    background-attachment: fixed;
+  }
+
+  /*
+    A Bodoni tem traços muito finos. Peso 600 + "opsz" baixo engrossam esses traços
+    e deixam os títulos fáceis de ler sem perder a elegância.
+    (classes como font-medium continuam funcionando, porque vêm depois)
+  */
+  .font-bodoni {
+    font-weight: 600;
+    font-optical-sizing: none;
+    font-variation-settings: "opsz" 18;
+    letter-spacing: -0.01em;
+  }
+
+  /* Quem pediu menos movimento no sistema não vê as animações */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
   }
 }

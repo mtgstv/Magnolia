@@ -143,6 +143,8 @@ function PromotionsCarousel({ promocoes }) {
                   draggable="false"
                   className="absolute inset-0 size-full select-none object-cover"
                 />
+                {/* Clareia o lado do texto para ele continuar legível sobre a foto */}
+                <div className="absolute inset-0 bg-linear-to-r from-white/90 via-white/60 to-transparent" />
 
                 <div className="relative flex h-full max-w-xl flex-col justify-center gap-3 px-8 sm:px-14">
                   <span className="w-fit rounded-full bg-white/80 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.2em] text-marca">

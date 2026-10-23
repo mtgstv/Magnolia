@@ -11,11 +11,13 @@ import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 // O mesmo perfume em volumes diferentes (ex.: 50 ml e 100 ml), cada um com preço e estoque
 @Entity
 @Table(name = "variante")
 @Getter
+@Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Variante {
 
@@ -36,6 +38,10 @@ public class Variante {
 	private Integer precoPromocionalCentavos;
 
 	private int estoque;
+
+	public Variante(Produto produto) {
+		this.produto = produto;
+	}
 
 	public boolean temDesconto() {
 		return precoPromocionalCentavos != null && precoPromocionalCentavos < precoCentavos;

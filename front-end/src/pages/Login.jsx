@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Lock, Mail } from "lucide-react";
 
 import LayoutAutenticacao from "../components/auth/LayoutAutenticacao";
 import Botao from "../components/ui/Botao";
@@ -53,7 +54,7 @@ export default function Login() {
   }
 
   return (
-    <LayoutAutenticacao titulo="Entrar" subtitulo="Que bom ter você de volta.">
+    <LayoutAutenticacao variante="entrar" titulo="Entrar" subtitulo="Que bom ter você de volta.">
       {aviso && !erroGeral && (
         <p className="mb-6 rounded-xl bg-marca-clara px-4 py-3 text-sm text-marca ring-1 ring-marca/20">{aviso}</p>
       )}
@@ -70,6 +71,8 @@ export default function Login() {
           name="email"
           type="email"
           rotulo="E-mail"
+          icone={Mail}
+          placeholder="seu@email.com"
           autoComplete="email"
           value={dados.email}
           onChange={alterar}
@@ -80,6 +83,7 @@ export default function Login() {
           id="login-senha"
           name="senha"
           rotulo="Senha"
+          icone={Lock}
           autoComplete="current-password"
           value={dados.senha}
           onChange={alterar}

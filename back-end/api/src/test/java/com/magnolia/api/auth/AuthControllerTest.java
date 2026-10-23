@@ -110,6 +110,43 @@ class AuthControllerTest extends TesteDeIntegracao {
 				.andExpect(cookie().maxAge(CookiesDeSessao.RENOVACAO, 0));
 	}
 
+	@Test
+	void senhaGrandeDemaisNaoDerrubaAApi() throws Exception {
+		// 40 letras com acento = 80 bytes, acima do limite de 72 do BCrypt
+		String senhaLonga = "ç".repeat(40);
+
+		mvc.perform(post("/auth/cadastro")
+				.contentType(MediaType.APPLICATION_JSON)
+				.content("""
+						{"nome": "Cliente", "email": "acentos@magnolia.com", "senha": "%s"}
+						""".formatted(senhaLonga)))
+				.andExpect(status().isBadRequest());
+
+		mvc.perform(post("/auth/login")
+				.contentType(MediaType.APPLICATION_JSON)
+				.content("""
+						{"email": "%s", "senha": "%s"}
+						""".formatted(cadastrar().email(), "a".repeat(200))))
+				.andExpect(status().isUnauthorized())
+				.andExpect(jsonPath("$.message").value("E-mail ou senha incorretos."));
+	}
+
+	@Test
+	void bloqueiaMuitasTentativasDeLoginDoMesmoIp() throws Exception {
+		for (int tentativa = 1; tentativa <= 11; tentativa++) {
+			mvc.perform(post("/auth/login")
+					.with(requisicao -> {
+						requisicao.setRemoteAddr("203.0.113.7");
+						return requisicao;
+					})
+					.contentType(MediaType.APPLICATION_JSON)
+					.content("""
+							{"email": "ninguem@magnolia.com", "senha": "chute-%d"}
+							""".formatted(tentativa)))
+					.andExpect(tentativa <= 10 ? status().isUnauthorized() : status().isTooManyRequests());
+		}
+	}
+
 	private static Cookie cookieChamado(Cookie[] cookies, String nome) {
 		return Arrays.stream(cookies).filter(c -> c.getName().equals(nome)).findFirst().orElseThrow();
 	}

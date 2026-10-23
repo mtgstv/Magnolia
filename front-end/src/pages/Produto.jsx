@@ -2,13 +2,17 @@ import { useCallback, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { Check } from "lucide-react";
 
+import AdicionarASacola from "../components/produto/AdicionarASacola";
+import Avaliacoes, { Estrelas } from "../components/produto/Avaliacoes";
 import BotaoFavorito from "../components/produto/BotaoFavorito";
 import GradeProdutos from "../components/produto/GradeProdutos";
 import ImagemProduto from "../components/produto/ImagemProduto";
 import MensagemErro from "../components/ui/MensagemErro";
 import Secao from "../components/ui/Secao";
 import Trilha from "../components/ui/Trilha";
+import { useAuth } from "../hooks/useAuth";
 import { useCarregar } from "../hooks/useCarregar";
+import { listarAvaliacoes } from "../services/avaliacoesService";
 import { buscarProduto, listarProdutos } from "../services/produtosService";
 import { formatarPreco, percentualDesconto, precoAtual, temDesconto } from "../utils/preco";
 import { nomeConcentracao, resumoDoDetalhe } from "../utils/produto";
@@ -25,6 +29,10 @@ function Produto() {
   const buscar = useCallback(() => buscarProduto(slug), [slug]);
   const produto = useCarregar(buscar);
   const todos = useCarregar(listarProdutos);
+  // Busca de novo ao entrar ou sair da conta (a resposta marca qual avaliação é "minha")
+  const { usuario } = useAuth();
+  const buscarAvaliacoes = useCallback(() => listarAvaliacoes(slug), [slug]);
+  const avaliacoes = useCarregar(buscarAvaliacoes, usuario?.id ?? null);
 
   const [varianteEscolhida, setVarianteEscolhida] = useState(null);
   const [imagemEscolhida, setImagemEscolhida] = useState(0);
@@ -84,11 +92,11 @@ function Produto() {
         <div className="mt-8 grid gap-10 lg:grid-cols-2 lg:gap-16">
           {/* Galeria */}
           <div>
-            <div className="relative aspect-square overflow-hidden rounded-3xl bg-stone-100">
+            <div className="relative aspect-square overflow-hidden rounded-3xl bg-areia">
               <ImagemProduto
                 src={imagem?.url}
                 alt={imagem?.alt ?? dados.nome}
-                className="size-full object-contain p-10 md:p-16"
+                className="size-full object-cover"
               />
               {emPromocao && (
                 <span className="absolute left-5 top-5 rounded-full bg-oferta px-3 py-1.5 text-sm font-semibold text-white">
@@ -105,11 +113,11 @@ function Produto() {
                     type="button"
                     onClick={() => setImagemEscolhida(indice)}
                     aria-label={`Ver imagem ${indice + 1}`}
-                    className={`size-20 overflow-hidden rounded-xl bg-stone-100 ring-2 ${
+                    className={`size-20 overflow-hidden rounded-xl bg-areia ring-2 ${
                       item === imagem ? "ring-marca" : "ring-transparent"
                     }`}
                   >
-                    <ImagemProduto src={item.url} alt="" className="size-full object-contain p-2" />
+                    <ImagemProduto src={item.url} alt="" className="size-full object-cover" />
                   </button>
                 ))}
               </div>
@@ -129,6 +137,13 @@ function Produto() {
               {nomeConcentracao(dados.concentracao)}
               {dados.familiaOlfativa && ` · ${dados.familiaOlfativa}`}
             </p>
+            {avaliacoes.dados?.total > 0 && (
+              <a href="#avaliacoes" className="mt-3 flex items-center gap-2 text-sm text-stone-600 hover:text-marca">
+                <Estrelas nota={avaliacoes.dados.media} />
+                {avaliacoes.dados.media.toLocaleString("pt-BR")} ({avaliacoes.dados.total}{" "}
+                {avaliacoes.dados.total === 1 ? "avaliação" : "avaliações"})
+              </a>
+            )}
 
             <div className="mt-6 flex flex-wrap items-baseline gap-x-3 gap-y-1">
               <span className={`text-3xl font-semibold ${emPromocao ? "text-oferta" : "text-stone-900"}`}>
@@ -177,7 +192,9 @@ function Produto() {
               {variante.emEstoque ? "Em estoque" : "Este volume está esgotado no momento"}
             </p>
 
-            <BotaoFavorito produto={resumoDoDetalhe(dados)} variante="completo" className="mt-6 sm:max-w-sm" />
+            <AdicionarASacola variante={variante} />
+
+            <BotaoFavorito produto={resumoDoDetalhe(dados)} variante="completo" className="mt-4 sm:max-w-sm" />
 
             {dados.descricao && <p className="mt-10 leading-relaxed text-stone-600">{dados.descricao}</p>}
 
@@ -199,6 +216,14 @@ function Produto() {
         </div>
       </div>
 
+      <section id="avaliacoes" className="conteudo mt-20 scroll-mt-24">
+        <p className="text-xs font-medium uppercase tracking-[0.3em] text-marca-media">Quem usa, conta</p>
+        <h2 className="mt-2 font-bodoni text-3xl text-stone-900 md:text-4xl">Avaliações</h2>
+        <div className="mt-8">
+          <Avaliacoes slug={dados.slug} avaliacoes={avaliacoes} />
+        </div>
+      </section>
+
       {relacionados.length > 0 && (
         <Secao rotulo="Da mesma família" titulo="Você também pode gostar">
           <GradeProdutos produtos={relacionados} />
@@ -211,17 +236,17 @@ function Produto() {
 function EsqueletoProduto() {
   return (
     <main className="conteudo animate-pulse pt-8" aria-busy="true">
-      <div className="h-4 w-64 rounded-full bg-stone-100" />
+      <div className="h-4 w-64 rounded-full bg-areia" />
       <div className="mt-8 grid gap-10 lg:grid-cols-2 lg:gap-16">
-        <div className="aspect-square rounded-3xl bg-stone-100" />
+        <div className="aspect-square rounded-3xl bg-areia" />
         <div className="flex flex-col gap-4">
-          <div className="h-3 w-24 rounded-full bg-stone-100" />
-          <div className="h-12 w-3/4 rounded-full bg-stone-100" />
-          <div className="h-4 w-1/2 rounded-full bg-stone-100" />
-          <div className="mt-4 h-9 w-40 rounded-full bg-stone-100" />
+          <div className="h-3 w-24 rounded-full bg-areia" />
+          <div className="h-12 w-3/4 rounded-full bg-areia" />
+          <div className="h-4 w-1/2 rounded-full bg-areia" />
+          <div className="mt-4 h-9 w-40 rounded-full bg-areia" />
           <div className="mt-6 flex gap-3">
-            <div className="h-16 w-28 rounded-2xl bg-stone-100" />
-            <div className="h-16 w-28 rounded-2xl bg-stone-100" />
+            <div className="h-16 w-28 rounded-2xl bg-areia" />
+            <div className="h-16 w-28 rounded-2xl bg-areia" />
           </div>
         </div>
       </div>

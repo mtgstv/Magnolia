@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Lock, Mail, User } from "lucide-react";
 
 import LayoutAutenticacao from "../components/auth/LayoutAutenticacao";
 import Botao from "../components/ui/Botao";
@@ -62,7 +63,7 @@ export default function Cadastro() {
   }
 
   return (
-    <LayoutAutenticacao titulo="Criar conta" subtitulo="Leva menos de um minuto.">
+    <LayoutAutenticacao variante="cadastro" titulo="Criar conta" subtitulo="Leva menos de um minuto.">
       {erroGeral && (
         <p role="alert" className="mb-6 rounded-xl bg-rose-50 px-4 py-3 text-sm text-rose-800 ring-1 ring-rose-200">
           {erroGeral}
@@ -74,6 +75,8 @@ export default function Cadastro() {
           id="cadastro-nome"
           name="nome"
           rotulo="Nome"
+          icone={User}
+          placeholder="Como podemos te chamar?"
           autoComplete="name"
           value={dados.nome}
           onChange={alterar}
@@ -85,6 +88,8 @@ export default function Cadastro() {
           name="email"
           type="email"
           rotulo="E-mail"
+          icone={Mail}
+          placeholder="seu@email.com"
           autoComplete="email"
           value={dados.email}
           onChange={alterar}
@@ -95,6 +100,7 @@ export default function Cadastro() {
           id="cadastro-senha"
           name="senha"
           rotulo="Senha"
+          icone={Lock}
           autoComplete="new-password"
           value={dados.senha}
           onChange={alterar}
@@ -106,6 +112,7 @@ export default function Cadastro() {
           id="cadastro-confirmacao"
           name="confirmacao"
           rotulo="Confirme a senha"
+          icone={Lock}
           autoComplete="new-password"
           value={dados.confirmacao}
           onChange={alterar}

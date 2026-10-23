@@ -1,6 +1,3 @@
-import { precoAtual } from "./preco";
-import { normalizarTexto } from "./texto";
-
 // Os filtros do catálogo ficam na URL (ex.: /catalogo?familia=Floral&marca=dior),
 // então dá para compartilhar o link e os links da home já abrem o catálogo filtrado
 
@@ -48,44 +45,20 @@ export function semFiltros(filtros) {
   return paraParams({ ...filtros, ordenacao: ORDENACAO_PADRAO }).size === 0;
 }
 
-const COMPARADORES = {
-  // A API já entrega do mais novo para o mais antigo
-  novidades: () => 0,
-  "menor-preco": (a, b) => precoAtual(a) - precoAtual(b),
-  "maior-preco": (a, b) => precoAtual(b) - precoAtual(a),
-  desconto: (a, b) => b.descontoMaximo - a.descontoMaximo,
-  "nome-az": (a, b) => a.nome.localeCompare(b.nome, "pt-BR"),
-  "nome-za": (a, b) => b.nome.localeCompare(a.nome, "pt-BR")
-};
+// Filtros no formato que a API espera em GET /produtos (ver FiltroProdutos.java).
+// A diferença para a URL do site: os preços vão em centavos e "promocao" vira true.
+export function paraParamsApi(filtros) {
+  const params = new URLSearchParams();
+  const centavos = (reais) => String(Math.round(Number(reais) * 100));
 
-export function filtrarProdutos(produtos, filtros) {
-  const termo = normalizarTexto(filtros.busca.trim());
+  if (filtros.busca.trim()) params.set("q", filtros.busca.trim());
+  if (filtros.categoria) params.set("categoria", filtros.categoria);
+  filtros.marcas.forEach((marca) => params.append("marca", marca));
+  filtros.familias.forEach((familia) => params.append("familia", familia));
+  if (filtros.precoMinimo !== "" && !Number.isNaN(Number(filtros.precoMinimo))) params.set("precoMin", centavos(filtros.precoMinimo));
+  if (filtros.precoMaximo !== "" && !Number.isNaN(Number(filtros.precoMaximo))) params.set("precoMax", centavos(filtros.precoMaximo));
+  if (filtros.somentePromocao) params.set("promocao", "true");
+  params.set("ordenacao", filtros.ordenacao);
 
-  // Os campos de preço são em reais; os preços dos produtos, em centavos.
-  // Se a pessoa inverter mínimo e máximo, a faixa é corrigida.
-  let minimo = filtros.precoMinimo === "" ? null : Number(filtros.precoMinimo) * 100;
-  let maximo = filtros.precoMaximo === "" ? null : Number(filtros.precoMaximo) * 100;
-  if (minimo != null && maximo != null && minimo > maximo) {
-    [minimo, maximo] = [maximo, minimo];
-  }
-
-  return produtos
-    .filter((produto) => {
-      const preco = precoAtual(produto);
-
-      return (
-        (termo === "" ||
-          normalizarTexto(produto.nome).includes(termo) ||
-          normalizarTexto(produto.marca).includes(termo) ||
-          normalizarTexto(produto.familiaOlfativa ?? "").includes(termo)) &&
-        (filtros.categoria === "" || produto.categoriaSlug === filtros.categoria) &&
-        (filtros.marcas.length === 0 || filtros.marcas.includes(produto.marcaSlug)) &&
-        (filtros.familias.length === 0 || filtros.familias.includes(produto.familiaOlfativa)) &&
-        (minimo == null || preco >= minimo) &&
-        (maximo == null || preco <= maximo) &&
-        // Em oferta = algum volume com desconto (não só o mais barato)
-        (!filtros.somentePromocao || produto.descontoMaximo > 0)
-      );
-    })
-    .sort(COMPARADORES[filtros.ordenacao] ?? COMPARADORES.novidades);
+  return params;
 }
