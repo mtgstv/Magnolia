@@ -1,51 +1,33 @@
 import { requisicao } from "./api";
 
-export function buscarCarrinho(){
+// A sacola fica na API (com ou sem login). Toda rota devolve a sacola inteira:
+// { itens, cupom: { codigo, descricao } | null, resumo: { subtotal, desconto, frete, total, ... } }
 
-    return requisicao("/carrinho", {
-        credentials:"include",
-    });
+export function buscarCarrinho() {
+  return requisicao("/carrinho");
 }
 
-export function adicionarItem(){
-    return requisicao("/carrinho/itens", {
-        method: "POST",
-        credentials:"include",
-        headers:{
-            "Content-Type" : "application/json",
-        },
-        body: JSON.stringify(dados),
-
-
-    });
+export function adicionarItem(varianteId, quantidade) {
+  return requisicao("/carrinho/itens", { method: "POST", corpo: { varianteId, quantidade } });
 }
 
-export function atualizarItem(id, dados){
-    return requisicao(`/carrinho/itens/${encodeURIComponent(id)}`, {
-
-        method: "PATCH",
-        credentials: "include",
-        headers:{
-            "Content-Type" : "application/json"
-        },
-        body: JSON.stringify(dados),
-    });
+export function atualizarItem(varianteId, quantidade) {
+  return requisicao(`/carrinho/itens/${encodeURIComponent(varianteId)}`, { method: "PATCH", corpo: { quantidade } });
 }
 
-export function removeritem(){
-    return requisicao(`/carrinho/itens/${encodeURIComponent(id)}`,{
-        method:"DELETE",
-        credentials:"include",
-    });
+export function removerItem(varianteId) {
+  return requisicao(`/carrinho/itens/${encodeURIComponent(varianteId)}`, { method: "DELETE" });
 }
 
-export function aplicarCupom(dados){
-    return requisicao("carrinho/cupom", {
-        method:"POST",
-        credentials:"include",
-        headers:{
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify(dados), 
-    });
+export function aplicarCupom(codigo) {
+  return requisicao("/carrinho/cupom", { method: "POST", corpo: { codigo } });
+}
+
+export function removerCupom() {
+  return requisicao("/carrinho/cupom", { method: "DELETE" });
+}
+
+// Opções de entrega para o CEP: [{ tipo, nome, prazo, valor, gratis }]
+export function calcularFrete(cep) {
+  return requisicao(`/carrinho/frete?cep=${encodeURIComponent(cep)}`);
 }

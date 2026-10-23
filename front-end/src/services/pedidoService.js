@@ -1,25 +1,19 @@
 import { requisicao } from "./api";
 
-export function criarPedido(dados){
-    return requisicao("/pedido",{
-        method:"POST",
-        credentials:"include",
-        headers:{
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify(dados),
-    });
+// dados: { endereco, frete: "PADRAO" | "EXPRESSA", pagamento: { metodo: "PIX" | "CARTAO", cartao? } }
+export function criarPedido(dados) {
+  return requisicao("/pedidos", { method: "POST", corpo: dados });
 }
 
-export function listarPedidos(){
-    return requisicao("/pedido", {
-        credentials: "include",
-
-    });
+export function listarPedidos() {
+  return requisicao("/pedidos");
 }
 
-export function buscarPedido(id){
-    return requisicao(`/pedido/${encodeURIComponent(id)}`,{
-        credentials: "include",
-    });
+export function buscarPedido(numero) {
+  return requisicao(`/pedidos/${encodeURIComponent(numero)}`);
+}
+
+// Só existe porque o pagamento é de teste: confirma o Pix como se o banco tivesse avisado
+export function simularPagamentoPix(numero) {
+  return requisicao(`/pedidos/${encodeURIComponent(numero)}/simular-pagamento`, { method: "POST" });
 }
