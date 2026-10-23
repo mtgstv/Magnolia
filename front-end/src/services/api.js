@@ -1,10 +1,10 @@
 const API_URL = import.meta.env.VITE_API_URL ?? "http://localhost:8080/api/v1";
 
-export async function requisicao(caminho) {
+export async function requisicao(caminho, opcoes = {}) {
   let resposta;
 
   try {
-    resposta = await fetch(`${API_URL}${caminho}`);
+    resposta = await fetch(`${API_URL}${caminho}`, opcoes);
   } catch {
     throw new Error(
       "Não foi possível conectar ao servidor. Tente novamente."
