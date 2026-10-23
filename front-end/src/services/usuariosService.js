@@ -1,36 +1,19 @@
 import { requisicao } from "./api";
 
-export function buscarPerfil(){
-    return requisicao("/me", {
-        credentials:"include",
-    });
+export function buscarPerfil() {
+  return requisicao("/me");
 }
 
-export function atualizarPerfil(dados){
-    return requisicao("/me", {
-        method:"PUT",
-        credentials:"include",
-        headers:{
-            "Content-Type": "application/json",
-        },
-        body: JSON.stringify(dados),
-    });
+// As funções abaixo ainda não têm rota na API
+
+export function atualizarPerfil(dados) {
+  return requisicao("/me", { method: "PUT", corpo: dados });
 }
 
-export function listarEndereco(dados){
-    return requisicao("/me/enderecos", {
-        credentials:"include",
-    })
+export function listarEnderecos() {
+  return requisicao("/me/enderecos");
 }
 
-export function cadastarEndereco(dados){
-    return requisicao("/me/enderecos", {
-        method: "POST",
-        credentials: "include",
-        headers:{
-            "Content-Type": "application/json",
-        },
-        body: JSON.stringify(dados),
-    });
-
+export function cadastrarEndereco(dados) {
+  return requisicao("/me/enderecos", { method: "POST", corpo: dados });
 }

@@ -1,7 +1,58 @@
 @import "tailwindcss";
-@import "./styles/global.css";
 
+/*
+  Identidade visual da Magnolia. Use pelo nome nas classes do Tailwind:
+  bg-marca, text-marca-media, border-destaque, font-bodoni...
+  Para mudar uma cor no site inteiro, basta trocar aqui.
+*/
 @theme {
   --font-bodoni: "Bodoni Moda", serif;
   --font-inter: "Inter", sans-serif;
+
+  /* Verde: botões, links e textos de destaque */
+  --color-marca: oklch(44.8% 0.119 151.328);          /* green-800 */
+  --color-marca-escura: oklch(26.6% 0.065 152.934);   /* green-950: rodapé e hover */
+  --color-marca-media: oklch(52.7% 0.154 150.069);    /* green-700: rótulos pequenos */
+  --color-marca-clara: oklch(98.2% 0.018 155.826);    /* green-50: fundos suaves */
+  --color-marca-suave: oklch(96.2% 0.044 156.743);    /* green-100: faixa de avisos */
+
+  /* Rosa da magnólia: hover e detalhes */
+  --color-destaque: oklch(71.8% 0.202 349.761);       /* pink-400 */
+  --color-destaque-clara: oklch(97.1% 0.014 343.198); /* pink-50 */
+
+  /* Selos de desconto */
+  --color-oferta: oklch(51.4% 0.222 16.935);          /* rose-700 */
+
+  /* Faixa de avisos do topo: cada aviso desce e aparece aos poucos */
+  --animate-aviso: aviso-entra 0.6s ease-out;
+
+  @keyframes aviso-entra {
+    from {
+      opacity: 0;
+      transform: translateY(-0.75rem);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+}
+
+/* Largura padrão das páginas: header, seções e rodapé alinhados na mesma margem */
+@utility conteudo {
+  width: 100%;
+  max-width: 1440px;
+  margin-inline: auto;
+  padding-inline: 1.5rem;
+
+  /* A partir do breakpoint lg (64rem), margem maior */
+  @media (width >= 64rem) {
+    padding-inline: 2.5rem;
+  }
+}
+
+@layer base {
+  body {
+    @apply bg-white font-inter text-stone-800 antialiased;
+  }
 }

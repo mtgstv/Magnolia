@@ -1,5 +1,5 @@
 import {requisicao} from "./api";
 
-export function listarcategorias() {
+export function listarCategorias() {
   return requisicao("/categorias");
 }

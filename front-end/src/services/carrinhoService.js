@@ -1,51 +1,23 @@
 import { requisicao } from "./api";
 
-export function buscarCarrinho(){
+// O carrinho ainda não tem rotas na API: estas chamadas já seguem o formato esperado
 
-    return requisicao("/carrinho", {
-        credentials:"include",
-    });
+export function buscarCarrinho() {
+  return requisicao("/carrinho");
 }
 
-export function adicionarItem(){
-    return requisicao("/carrinho/itens", {
-        method: "POST",
-        credentials:"include",
-        headers:{
-            "Content-Type" : "application/json",
-        },
-        body: JSON.stringify(dados),
-
-
-    });
+export function adicionarItem(dados) {
+  return requisicao("/carrinho/itens", { method: "POST", corpo: dados });
 }
 
-export function atualizarItem(id, dados){
-    return requisicao(`/carrinho/itens/${encodeURIComponent(id)}`, {
-
-        method: "PATCH",
-        credentials: "include",
-        headers:{
-            "Content-Type" : "application/json"
-        },
-        body: JSON.stringify(dados),
-    });
+export function atualizarItem(id, dados) {
+  return requisicao(`/carrinho/itens/${encodeURIComponent(id)}`, { method: "PATCH", corpo: dados });
 }
 
-export function removeritem(){
-    return requisicao(`/carrinho/itens/${encodeURIComponent(id)}`,{
-        method:"DELETE",
-        credentials:"include",
-    });
+export function removerItem(id) {
+  return requisicao(`/carrinho/itens/${encodeURIComponent(id)}`, { method: "DELETE" });
 }
 
-export function aplicarCupom(dados){
-    return requisicao("carrinho/cupom", {
-        method:"POST",
-        credentials:"include",
-        headers:{
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify(dados), 
-    });
+export function aplicarCupom(dados) {
+  return requisicao("/carrinho/cupom", { method: "POST", corpo: dados });
 }

@@ -1,25 +1,15 @@
 import { requisicao } from "./api";
 
-export function criarPedido(dados){
-    return requisicao("/pedido",{
-        method:"POST",
-        credentials:"include",
-        headers:{
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify(dados),
-    });
+// Os pedidos ainda não têm rotas na API: estas chamadas já seguem o formato esperado
+
+export function criarPedido(dados) {
+  return requisicao("/pedidos", { method: "POST", corpo: dados });
 }
 
-export function listarPedidos(){
-    return requisicao("/pedido", {
-        credentials: "include",
-
-    });
+export function listarPedidos() {
+  return requisicao("/pedidos");
 }
 
-export function buscarPedido(id){
-    return requisicao(`/pedido/${encodeURIComponent(id)}`,{
-        credentials: "include",
-    });
+export function buscarPedido(id) {
+  return requisicao(`/pedidos/${encodeURIComponent(id)}`);
 }

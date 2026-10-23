@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 500" role="img" aria-label="Frasco de Libre">
+  <defs>
+    <linearGradient id="vidro" x1="0" x2="1" y1="0" y2="0">
+      <stop offset="0" stop-color="#f8e6c8" stop-opacity="0.95"/>
+      <stop offset="0.5" stop-color="#ffffff" stop-opacity="0.55"/>
+      <stop offset="1" stop-color="#f8e6c8" stop-opacity="0.95"/>
+    </linearGradient>
+    <linearGradient id="liquido" x1="0" x2="0" y1="0" y2="1">
+      <stop offset="0" stop-color="#f2c98a"/>
+      <stop offset="1" stop-color="#e3a857"/>
+    </linearGradient>
+    <linearGradient id="tampa" x1="0" x2="1">
+      <stop offset="0" stop-color="#1c1917"/>
+      <stop offset="0.45" stop-color="#ffffff" stop-opacity="0.35"/>
+      <stop offset="1" stop-color="#1c1917"/>
+    </linearGradient>
+    <clipPath id="dentro"><rect x="100" y="205" width="200" height="235" rx="20" /></clipPath>
+  </defs>
+  <ellipse cx="200" cy="452" rx="125" ry="12" fill="#000" opacity="0.07"/>
+  <rect x="178" y="182" width="44" height="27" fill="#f8e6c8"/>
+  <rect x="100" y="205" width="200" height="235" rx="20" fill="url(#vidro)" stroke="#e3a857" stroke-opacity="0.25" stroke-width="2"/>
+  <rect x="0" y="256.7" width="400" height="500" fill="url(#liquido)" opacity="0.88" clip-path="url(#dentro)"/>
+  <rect x="118" y="231" width="12" height="141" rx="6" fill="#fff" opacity="0.35" clip-path="url(#dentro)"/>
+  <rect x="165" y="110" width="70" height="74" rx="6" fill="url(#tampa)" stroke="#000" stroke-opacity="0.12" stroke-width="1.5"/>
+  <rect x="135" y="304" width="130" height="52" rx="4" fill="#1c1917" opacity="0.92"/>
+  <text x="200" y="327" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="15.0" letter-spacing="1.5" fill="#f5d08a">YSL</text>
+  <text x="200" y="346" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-style="italic" font-size="12.0" fill="#f5d08a" opacity="0.8">Libre</text>
+</svg>

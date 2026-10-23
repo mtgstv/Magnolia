@@ -1,12 +1,14 @@
-import { useState } from 'react'
-import Home from './pages/Home'
-import AppRoutes from './Routes/AppRoutes'
+import AuthProvider from './contexts/AuthProvider'
+import FavoritosProvider from './contexts/FavoritosProvider'
+import AppRoutes from './routes/AppRoutes'
 
 function App() {
-  const [count, setCount] = useState(0)
-
   return (
-    <AppRoutes/>
+    <AuthProvider>
+      <FavoritosProvider>
+        <AppRoutes/>
+      </FavoritosProvider>
+    </AuthProvider>
   )
 }
 
